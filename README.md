@@ -19,7 +19,7 @@ Using KMeans clustering and the elbow method to determine the users location bas
 `python27 modelling.py -t data/week1.mat data/week2.mat data/week3.mat data/week4.mat data/week5.mat -e data/week5.mat -m clustering` 
 
 ### Results
-Using the elbow method we found that 5 categories was the ideal number of clusters.
+Using the elbow method we found that 2 categories was the ideal number of clusters.
 
 ## Data
 The data collected by Google Maps over 5 weeks. The data is taken every half an hour.
