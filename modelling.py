@@ -102,13 +102,13 @@ def test_solvers(features, labels, test_features, test_labels):
 def test_elbow(features, test_features, test_labels):
 	prev_score = 0
 	predicted_of_prev = []
-	min_k = 5 # derived from looking at the elbow plot
+	min_k = 2 # derived from looking at the elbow plot
 
 	km = np.array([])
 	scores = np.array([])
 	distortions = np.array([])
 
-	for k in range(2,15):
+	for k in range(1,15):
 		score = train_model_clustering(features, test_features, test_labels, k)
 		km = np.append(km, [k])
 		scores = np.append(scores, [score])
