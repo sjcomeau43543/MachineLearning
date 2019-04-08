@@ -80,7 +80,7 @@ def extract_data(files, bits):
 #     score - the score of the models accuracy, generated using the test data and labels
 # FUNCTIONALITY
 def train_model_SVM(train, train_labels, test, test_labels):
-	model = SVC(kernel='linear' degree=5)
+	model = SVC(kernel='linear')
 	fitted = model.fit(train, train_labels)
 	predicted = fitted.predict(test)
 	score = fitted.score(test, test_labels)
