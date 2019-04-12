@@ -12,26 +12,10 @@ from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 
-# plot_dataset
-# INPUTS
-#     features - the features of the training data
-#     labels   - the labels of the training data
-#     test_features - the test features
-#     test_labels   - the labels of the test dataset
-# OUTPUTS
-# FUNCTIONALITY
-#     creates a 3d plot of the data
-def plot_dataset(train_features, train_labels, test_features, test_labels):
-	fig = plt.figure()
-	ax = fig.add_subplot(111, projection='3d')
-
-	ax.scatter(train_features[:,0], train_features[:,1], zs=train_labels, c='pink')
-	ax.scatter(test_features[:,0], test_features[:,1], zs=test_labels, c='black')
-
-	plt.xticks(())
-	plt.yticks(())
-
-	plt.show()
+# CNN 
+import sys
+sys.path.insert(0, 'exported_src')
+import network
 
 # extract_data
 # INPUTS
@@ -46,7 +30,8 @@ def extract_data(files, bits):
   first = 1
 
   for dataset in files:
-  # load data
+
+    # load data
     with open(dataset) as csv_file:
       reader = csv.reader(csv_file, delimiter=',')
       for row in reader:
@@ -66,7 +51,7 @@ def extract_data(files, bits):
 
   print features
   print labels
-  return features, labels
+  return features.astype(float), labels.astype(float)
 
 
 
@@ -133,6 +118,29 @@ def train_model_DTree(train, train_labels, test, test_labels):
 
 	return score
 
+
+	
+# train_model_CNN
+# INPUTS
+#     train        - the features of the training data
+#     train_labels - the labels of the training data
+#     test         - the values to test the model on
+#     test_labels  - the labels of the test dataset to test accuracy of the model
+# OUTPUTS
+#     score - the score of the models accuracy, generated using the test data and labels
+# FUNCTIONALITY
+def train_model_CNN(train, train_labels, test, test_labels):
+  # 8 nodes on output layer, 1 hidden layer, 32 nodes on input layer
+  net = network.Network([len(train[0]), 1, 8])
+
+  train_labels = [ [x] for x in train_labels ]
+
+  # 1 epoch, 10 batch size, learning rate of 3.0
+  net.SGD(zip(train, train_labels), 1, 10, 3.0)
+
+
+  return
+
 # MAIN function
 def main():
 	# set up the argument parser
@@ -141,7 +149,6 @@ def main():
 	parser.add_argument('-b', '--bits', help='the number of bits in the prn', type=int, required=1)
 	parser.add_argument('-e', '--testing', nargs=1, help='the testing dataset; .mat file', required=1) 
 	parser.add_argument('-m', '--method', help='either <CNN>, <SVM>, <KNN>, <DTree>, <Other>', required=1)
-	parser.add_argument('-p', '--plot', action='store_true', help='plot the datasets')
 	parser.add_argument('-s', '--sound', action='store_true', help='play a sound when its done')
 	parser.add_argument('-d', '--debug', action='store_true', help='debug')
 
@@ -161,6 +168,13 @@ def main():
 	# use CNN to create a model
 	if args.method == 'CNN':
 		print 'Using CNN to solve...'
+
+		# train the model
+		score = train_model_CNN(train_features, train_labels, test_features, test_labels)
+			
+    # play a sound so i know it's done and can start a new one
+		if args.sound:
+		  os.system('play -nq -t alsa synth 1 sine 600')
 	
 	# use SVM to create a model
 	elif args.method == 'SVM':
@@ -168,10 +182,6 @@ def main():
 
 		# train the model
 		score = train_model_SVM(train_features, train_labels, test_features, test_labels)
-
-		# plot the training and testing datasets on a 3d plane
-		if args.plot:
-			plot_dataset(train_features, train_labels, test_features, test_labels)
 			
     # play a sound so i know it's done and can start a new one
 		if args.sound:
@@ -183,10 +193,6 @@ def main():
 		
 		# train the model
 		score = train_model_KNN(train_features, train_labels, test_features, test_labels)
-
-		# plot the training and testing datasets on a 3d plane
-		if args.plot:
-			plot_dataset(train_features, train_labels, test_features, test_labels)
 			
     # play a sound so i know it's done and can start a new one
 		if args.sound:
@@ -198,10 +204,6 @@ def main():
 		
 		# train the model
 		score = train_model_DTree(train_features, train_labels, test_features, test_labels)
-
-		# plot the training and testing datasets on a 3d plane
-		if args.plot:
-			plot_dataset(train_features, train_labels, test_features, test_labels)
 			
     # play a sound so i know it's done and can start a new one
 		if args.sound:
