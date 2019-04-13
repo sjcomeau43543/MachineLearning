@@ -11,11 +11,12 @@ import os
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
 
 # CNN 
-import sys
-sys.path.insert(0, 'exported_src')
-import network
+import keras
+from keras.models import Sequential
+from keras.layers import Dense, Activation
 
 # extract_data
 # INPUTS
@@ -53,7 +54,56 @@ def extract_data(files, bits):
   print labels
   return features.astype(float), labels.astype(float)
 
+	
+# train_model_CNN
+# INPUTS
+#     train        - the features of the training data
+#     train_labels - the labels of the training data
+#     test         - the values to test the model on
+#     test_labels  - the labels of the test dataset to test accuracy of the model
+# OUTPUTS
+#     score - the score of the models accuracy, generated using the test data and labels
+# FUNCTIONALITY
+def train_model_CNN(train, train_labels, test, test_labels):
+	model = Sequential([
+		    Dense(32, input_shape=(32,)),
+		    Activation('relu'),
+		    Dense(10),
+		    Activation('softmax'),
+		])
+	model.compile(optimizer='rmsprop', loss='mse')
 
+	fitted = model.fit(train, train_labels)
+	#predicted = fitted.predict(test)
+	#score = fitted.score(test, test_labels)
+
+	#if debug:
+	#	print 'Predicted: ', predicted
+	#	print 'Mean Accuracy: ', score
+
+	#return score
+
+
+# train_model_RF
+# INPUTS
+#     train        - the features of the training data
+#     train_labels - the labels of the training data
+#     test         - the values to test the model on
+#     test_labels  - the labels of the test dataset to test accuracy of the model
+# OUTPUTS
+#     score - the score of the models accuracy, generated using the test data and labels
+# FUNCTIONALITY
+def train_model_RF(train, train_labels, test, test_labels):
+	model = RandomForestClassifier(n_estimators=10, min_samples_leaf=30)
+	fitted = model.fit(train, train_labels)
+	predicted = fitted.predict(test)
+	score = fitted.score(test, test_labels)
+
+	if debug:
+		print 'Predicted: ', predicted
+		print 'Mean Accuracy: ', score
+
+	return score
 
 # train_model_SVM
 # INPUTS
@@ -119,27 +169,6 @@ def train_model_DTree(train, train_labels, test, test_labels):
 	return score
 
 
-	
-# train_model_CNN
-# INPUTS
-#     train        - the features of the training data
-#     train_labels - the labels of the training data
-#     test         - the values to test the model on
-#     test_labels  - the labels of the test dataset to test accuracy of the model
-# OUTPUTS
-#     score - the score of the models accuracy, generated using the test data and labels
-# FUNCTIONALITY
-def train_model_CNN(train, train_labels, test, test_labels):
-  # 8 nodes on output layer, 1 hidden layer, 32 nodes on input layer
-  net = network.Network([len(train[0]), 1, 8])
-
-  train_labels = [ [x] for x in train_labels ]
-
-  # 1 epoch, 10 batch size, learning rate of 3.0
-  net.SGD(zip(train, train_labels), 1, 10, 3.0)
-
-
-  return
 
 # MAIN function
 def main():
@@ -210,12 +239,19 @@ def main():
 		  os.system('play -nq -t alsa synth 1 sine 600')
 
 	# use Other to create a model
-	elif args.method == 'Other':
-		print 'Using Other to solve...'
+	elif args.method == 'RF':
+		print 'Using Random Forest to solve...'
+		
+		# train the model
+		score = train_model_RF(train_features, train_labels, test_features, test_labels)
+			
+    # play a sound so i know it's done and can start a new one
+		if args.sound:
+		  os.system('play -nq -t alsa synth 1 sine 600')
 
 	# 
 	else:
-		print 'ERROR: <CNN>, <SVM>, <KNN>, <DTree>, <Other>'
+		print 'ERROR: <CNN>, <SVM>, <KNN>, <DTree>, <RF>'
 
 
 main()
