@@ -65,23 +65,20 @@ def extract_data(files, bits):
 #     score - the score of the models accuracy, generated using the test data and labels
 # FUNCTIONALITY
 def train_model_CNN(train, train_labels, test, test_labels):
-	model = Sequential([
-		    Dense(32, input_shape=(32,)),
-		    Activation('relu'),
-		    Dense(10),
-		    Activation('softmax'),
-		])
-	model.compile(optimizer='rmsprop', loss='mse')
+	model = Sequential()
+	model.add(Dense(32, activation='relu', input_dim=len(train[0])))
+	model.add(Dense(1, activation='sigmoid'))
+	model.compile(optimizer='rmsprop',
+		      loss='binary_crossentropy',
+		      metrics=['accuracy'])
 
 	fitted = model.fit(train, train_labels)
-	#predicted = fitted.predict(test)
-	#score = fitted.score(test, test_labels)
+	score = model.evaluate(test, test_labels)
 
-	#if debug:
-	#	print 'Predicted: ', predicted
-	#	print 'Mean Accuracy: ', score
+	if debug:
+		print 'Mean Accuracy: ', score
 
-	#return score
+	return score
 
 
 # train_model_RF
